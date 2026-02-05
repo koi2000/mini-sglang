@@ -244,6 +244,7 @@ async def v1_root():
 @app.post("/v1/chat/completions")
 async def v1_completions(req: OpenAICompletionRequest):
     state = get_global_state()
+    # 1. 解析输入（支持 messages 或 prompt 格式）
     if req.messages:
         prompt = [msg.model_dump() for msg in req.messages]
     else:
@@ -251,7 +252,9 @@ async def v1_completions(req: OpenAICompletionRequest):
         prompt = req.prompt
 
     # TODO: support more sampling parameters
+    # 2. 分配唯一的请求 ID
     uid = state.new_user()
+    # 3. 创建 TokenizeMsg 并发送给 Tokenizer Worker
     await state.send_one(
         TokenizeMsg(
             uid=uid,
@@ -266,6 +269,7 @@ async def v1_completions(req: OpenAICompletionRequest):
     async def _abort():
         await state.abort_user(uid)
 
+    # 4. 返回流式响应
     return StreamingResponse(
         state.stream_chat_completions(uid),
         media_type="text/event-stream",
@@ -401,6 +405,8 @@ def run_api_server(config: ServerArgs, start_backend: Callable[[], None], run_sh
     port = config.server_port
 
     assert _GLOBAL_STATE is None, "Global state is already initialized"
+    # 这里开始初始化global state
+    # 创建了两个东西, 一个是send的tokenizer和receiver的tokenizer
     _GLOBAL_STATE = FrontendManager(
         config=config,
         recv_tokenizer=ZmqAsyncPullQueue(

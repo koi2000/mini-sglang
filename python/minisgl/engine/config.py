@@ -1,3 +1,13 @@
+"""
+引擎配置模块 - 定义推理引擎的配置参数
+
+该模块提供了 EngineConfig 配置类，用于配置：
+1. 模型相关：模型路径、数据类型、最大序列长度
+2. 分布式：张量并行配置、通信超时
+3. 内存管理：页大小、内存比例、页数
+4. 性能优化：注意力后端、CUDA Graph 批次大小
+5. 调试选项：虚拟权重、PyNCCL 使用
+"""
 from __future__ import annotations
 
 from dataclasses import dataclass

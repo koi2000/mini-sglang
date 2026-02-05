@@ -10,7 +10,7 @@ from minisgl.distributed import DistributedInfo
 from minisgl.scheduler import SchedulerConfig
 from minisgl.utils import cached_load_hf_config, init_logger
 
-
+# 服务器参数, 包括了服务器地址, 端口, 是否共享tokenizer, 是否静默输出
 @dataclass(frozen=True)
 class ServerArgs(SchedulerConfig):
     server_host: str = "127.0.0.1"
